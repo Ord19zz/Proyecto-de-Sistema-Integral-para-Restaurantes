@@ -1,0 +1,64 @@
+-- esquema simplificado
+id SERIAL PRIMARY KEY,
+name VARCHAR(50) NOT NULL,
+capacity INT NOT NULL,
+status VARCHAR(50) DEFAULT 'FREE'
+);
+
+
+CREATE TABLE customer (
+id SERIAL PRIMARY KEY,
+name VARCHAR(200),
+phone VARCHAR(50),
+email VARCHAR(200)
+);
+
+
+CREATE TABLE reservation (
+id SERIAL PRIMARY KEY,
+customer_id INT REFERENCES customer(id),
+table_id INT REFERENCES "table"(id),
+datetime_from TIMESTAMP NOT NULL,
+datetime_to TIMESTAMP NOT NULL,
+status VARCHAR(50) DEFAULT 'CONFIRMED'
+);
+
+
+CREATE TABLE "order" (
+id SERIAL PRIMARY KEY,
+table_id INT REFERENCES "table"(id),
+customer_id INT REFERENCES customer(id),
+created_at TIMESTAMP DEFAULT now(),
+status VARCHAR(50) DEFAULT 'CREATED'
+);
+
+
+CREATE TABLE order_item (
+id SERIAL PRIMARY KEY,
+order_id INT REFERENCES "order"(id) ON DELETE CASCADE,
+menu_item_id INT REFERENCES menu_item(id),
+quantity INT NOT NULL DEFAULT 1,
+unit_price NUMERIC(10,2) NOT NULL,
+notes TEXT,
+status VARCHAR(50) DEFAULT 'PENDING'
+);
+
+
+CREATE TABLE invoice (
+id SERIAL PRIMARY KEY,
+order_id INT REFERENCES "order"(id),
+issued_at TIMESTAMP DEFAULT now(),
+total NUMERIC(12,2),
+tax NUMERIC(10,2),
+paid BOOLEAN DEFAULT FALSE,
+payment_method VARCHAR(100)
+);
+
+
+CREATE TABLE inventory_item (
+id SERIAL PRIMARY KEY,
+name VARCHAR(200) NOT NULL,
+unit VARCHAR(50),
+quantity NUMERIC(12,3) DEFAULT 0,
+threshold NUMERIC(12,3) DEFAULT 0
+);
